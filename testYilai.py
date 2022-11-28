@@ -201,16 +201,16 @@ def cam_test(res):
         ret,frame = video.read()
         frame = cv2.resize(frame, (res, res))
         #frame = cv2.flip(frame,-1)
-        cv2.imshow("original",frame)
+        #cv2.imshow("original",frame)
         edges = detect_edges(frame)
         roi = region_of_interest(edges)
         line_segments = detect_line_segments(roi)
         lane_lines = average_slope_intercept(frame,line_segments)
         lane_lines_image = display_lines(frame,lane_lines)
         cv2.imshow("lane_lines_image",lane_lines_image)
-        steering_angle = get_steering_angle(frame, lane_lines)
-        heading_image = display_heading_line(lane_lines_image,steering_angle)
-        cv2.imshow("heading line",heading_image)
+        #steering_angle = get_steering_angle(frame, lane_lines)
+        #heading_image = display_heading_line(lane_lines_image,steering_angle)
+        #cv2.imshow("heading line",heading_image)
         print("Frame processed\n")
         k = cv2.waitKey(1) & 0xFF
         if k == ord('q'):
@@ -267,7 +267,7 @@ def main(res=100, kpr=12, kdr=8, driving_speed = 7.92 ):
                   break
                 a = j + 100
                 red_detected = True
-                #print("red detected so pwm set duty cycle")
+                print("red detected so pwm set duty cycle")
                 #PWM.set_duty_cycle(driving_port,7.5)
                 time.sleep(2)
         
@@ -277,7 +277,6 @@ def main(res=100, kpr=12, kdr=8, driving_speed = 7.92 ):
         line_segments = detect_line_segments(roi)
         lane_lines = average_slope_intercept(frame,line_segments)
         steering_angle = get_steering_angle(frame, lane_lines)
-        print("steering angle", steering_angle)
         
         #deviation calculation for P and D
         #now = time.time()
