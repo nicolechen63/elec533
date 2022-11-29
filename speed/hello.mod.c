@@ -26,6 +26,7 @@ MODULE_INFO(retpoline, "Y");
 static const struct modversion_info ____versions[]
 __used __section("__versions") = {
 	{ 0xfa12b18c, "module_layout" },
+	{ 0x350ed57f, "param_ops_ulong" },
 	{ 0xf0fda7ad, "platform_driver_unregister" },
 	{ 0xbde95e6d, "__platform_driver_register" },
 	{ 0x1747be18, "gpiod_set_debounce" },
@@ -34,6 +35,7 @@ __used __section("__versions") = {
 	{ 0x6be88ee4, "devm_gpiod_get" },
 	{ 0xc1514a3b, "free_irq" },
 	{ 0xc5850110, "printk" },
+	{ 0x15ba50a6, "jiffies" },
 };
 
 MODULE_INFO(depends, "");

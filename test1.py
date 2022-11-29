@@ -199,7 +199,11 @@ def cam_test(res):
     #video.set(cv2.CAP_PROP_FRAME_HEIGHT,60)#240
     while(True):      
         ret,frame = video.read()
+        #print("ret:", ret)
+        #print("frame shape:", frame.shape)
         frame = cv2.resize(frame, (res, res))
+        print("res:",res)
+        #print("frame shape:", frame.shape)
         #frame = cv2.flip(frame,-1)
         cv2.imshow("original",frame)
         edges = detect_edges(frame)

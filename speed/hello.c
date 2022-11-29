@@ -16,20 +16,29 @@
 #include <linux/gpio/consumer.h>
 #include <linux/platform_device.h>
 
-/* YOU WILL NEED OTHER HEADER FILES */
 #include <linux/interrupt.h>
+#include <linux/sched.h>
 
 // variables
 static int irq_number;
 static struct gpio_desc *gpiod_but;
-static long long int count;
+static unsigned long count;
+static unsigned long t, t0, t1;
+
+// parameter
+module_param(count, ulong, S_IRUGO|S_IWUSR);
+module_param(t, ulong, S_IRUGO|S_IWUSR);
 
 /* ADD THE INTERRUPT SERVICE ROUTINE HERE */
 // https://github.com/Johannes4Linux/Linux_Driver_Tutorial/blob/main/11_gpio_irq/gpio_irq.c
 static irq_handler_t gpio_irq_handler(unsigned int irq, void *dev_id, struct pt_regs *regs) {
-	printk(KERN_INFO "button pressed"); // print the led state
+	//printk(KERN_INFO "button pressed"); // print the led state
 
 	count++;
+	t1 = jiffies;
+	t = t1 - t0;
+	printk(KERN_INFO "count = %ld, period = %ld",count, t);
+	t0 = t1;
 
 	return (irq_handler_t) IRQ_HANDLED; 
 }
@@ -58,6 +67,11 @@ static int led_probe(struct platform_device *pdev)
 
 	// initialize counter for speed encoding
 	count = 0;
+	t = HZ;
+	t0 = jiffies;
+
+	printk("one second: %ld\n", t);
+	printk("jiffies: %ld\n", t0);
 
 	return 0;
 }
