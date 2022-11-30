@@ -193,8 +193,8 @@ def cam_test(res):
     '''
     #Capturing
     video = cv2.VideoCapture(2)
-    video.set(cv2.CAP_PROP_FRAME_WIDTH, 640) #320
-    video.set(cv2.CAP_PROP_FRAME_HEIGHT, 480) #240
+    video.set(cv2.CAP_PROP_FRAME_WIDTH, 160) #320
+    video.set(cv2.CAP_PROP_FRAME_HEIGHT, 120) #240
     #video.set(cv2.CAP_PROP_FRAME_WIDTH,320)#320
     #video.set(cv2.CAP_PROP_FRAME_HEIGHT,60)#240
     while(True):      
