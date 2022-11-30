@@ -30,9 +30,25 @@ class VideoStream:
     def __init__(self,resolution=(640,480),framerate=30):
         # Initialize the PiCamera and the camera image stream
         self.stream = cv2.VideoCapture(2)
-        ret = self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+        #ret = self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
         ret = self.stream.set(3,resolution[0])
         ret = self.stream.set(4,resolution[1])
+        
+        #ret,frame = video.read()
+        print("ret:", ret)
+        #print("frame shape:", frame.shape)
+        
+        if not self.stream.isOpened():
+            print("Cannot open camera")
+            exit()
+        
+        if not ret:
+            print("Can't receive frame (stream end?). Exiting ...")
+            #break
+        #frame = cv2.resize(frame, (res, res))
+        #print("res:", res)
+        #print("frame shape:", frame.shape)
+
             
         # Read first frame from the stream
         (self.grabbed, self.frame) = self.stream.read()
@@ -177,6 +193,8 @@ while True:
 
     # Grab frame from video stream
     frame1 = videostream.read()
+    print("frame:", frame)
+    print("frame:", frame.shape)
 
     # Acquire frame and resize to expected shape [1xHxWx3]
     frame = frame1.copy()
