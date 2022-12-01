@@ -2,7 +2,7 @@ import time
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+import math
 import tflite_runtime.interpreter as tflite
 
 class Camera:
@@ -26,7 +26,7 @@ class Camera:
         self.data["k"] = []
         self.data["time"] = []
         self.interpreter = tflite.Interpreter(
-            model_path="/home/debian/elec533/best-fp16.tflite", num_threads=2)
+            model_path="/home/debian/elec533/best-fp16-2.tflite", num_threads=2)
         self.interpreter.allocate_tensors()
         self.output = self.interpreter.get_output_details()[0]
         self.input = self.interpreter.get_input_details()[0]
@@ -38,17 +38,25 @@ class Camera:
         frame = cv2.resize(frame, (self.model_size, self.model_size))
         frame = frame.astype("float32")/255
         input_data = np.expand_dims(frame, axis=0)
+        # scale, zero_point = self.input['quantization']
+        # input_data = (input_data / scale + zero_point).astype(np.uint8)
 
         self.interpreter.set_tensor(self.input['index'], input_data)
         self.interpreter.invoke()
         output_data = self.interpreter.get_tensor(self.output['index'])[0]
 
+        # scale, zero_point = self.output['quantization']
         class_id = []
         boxes = []
         confs = []
         for i in range(output_data.shape[0]):
+            # confidence = (output_data[i][4] - zero_point) * scale
             confidence = output_data[i][4]
             if confidence > self.conf_threshold:
+                # center_x = int((output_data[i][0] - zero_point) * scale * self.width)
+                # center_y = int((output_data[i][1] - zero_point) * scale * self.height)
+                # width = int((output_data[i][2] - zero_point) * scale * self.width)
+                # height = int((output_data[i][3] - zero_point) * scale * self.height)
                 center_x = int(output_data[i][0] * self.width)
                 center_y = int(output_data[i][1] * self.height)
                 width = int(output_data[i][2] * self.width)
@@ -73,10 +81,10 @@ class Camera:
         '''
         detect_red color with a given threshold. <:
         '''
-        lower_red = np.array([150, 70, 50], dtype="uint8")
-        upper_red = np.array([180, 255, 255], dtype="uint8")
+        lower_red = np.array([140, 60, 40], dtype="uint8")
+        upper_red = np.array([200, 255, 255], dtype="uint8")
         mask = cv2.inRange(hsv, lower_red, upper_red)
-        cv2.imshow("red",mask)
+        # cv2.imshow("red",mask)
         count = mask.sum()/255
         self.data["red_mask"].append(count)
         return (count > self.red_threshold)
@@ -85,10 +93,10 @@ class Camera:
         '''
         detect_red color with a given threshold. <:
         '''
-        lower_blue = np.array([90, 120, 0], dtype="uint8")
-        upper_blue = np.array([150, 255, 255], dtype="uint8")
+        lower_blue = np.array([85, 115, 0], dtype="uint8")
+        upper_blue = np.array([155, 255, 255], dtype="uint8")
         mask = cv2.inRange(hsv, lower_blue, upper_blue)
-        cv2.imshow("blue",mask)
+        # cv2.imshow("blue",mask)
         return mask
 
     def display_box(self, boxes, confs, indices, line_color=(0, 255, 0), line_width=1):
@@ -108,7 +116,7 @@ class Camera:
 
     def display_lines(self, lines, line_color=(0, 255, 0), line_width=1):
         # this just displays the boundary lines we previously found on the image
-        line_image = np.zeros([int(self.height/2), self.width, 3], np.uint8)
+        line_image = np.zeros([self.height, self.width, 3], np.uint8)
 
         for line in lines:
             for x1, y1, x2, y2 in line:
@@ -122,20 +130,20 @@ class Camera:
         cv2.imshow("edges",edges)
         rho = 1
         theta = np.pi / 180
-        min_threshold = 20
+        min_threshold = 40
         line_segments = cv2.HoughLinesP(edges, rho, theta, min_threshold,
-                                        np.array([]), minLineLength=10, maxLineGap=10)
+                                        np.array([]), minLineLength=20, maxLineGap=20)
         if line_segments is None:
             return 0
-        self.display_lines(line_segments)
+        # self.display_lines(line_segments)
         left = []
         right = []
         for line in line_segments:
-            k = (line[0][3]-line[0][1])/(line[0][2]-line[0][0] + 0.1)
-            if k > 0.1:
-                right.append(k)
-            elif k < -0.1:
-                left.append(k)
+            theta = math.atan((line[0][3]-line[0][1])/(line[0][2]-line[0][0]+0.1))
+            if theta > 0.1:
+                right.append(theta)
+            elif theta < -0.1:
+                left.append(theta)
         left_k = np.average(left) if left else 0
         right_k = np.average(right) if right else 0
         return (left_k + right_k)
@@ -144,8 +152,8 @@ class Camera:
         _, frame = self.cam.read()
         cv2.imshow("frame",frame)
         self.data["time"].append(time.time())
-        hsv = cv2.cvtColor(frame[int(self.height/2):, :, :], cv2.COLOR_BGR2HSV)
-        red = self.detect_red(hsv)
+        hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        red = self.detect_red(hsv[int(self.height/2):, :, :])
         blue_mask = self.detect_blue(hsv)
         k = self.detect_lines(blue_mask)
         stop = self.detect_stop(frame)
