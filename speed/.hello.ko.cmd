@@ -1,1 +1,0 @@
-cmd_/home/debian/elec533/speed/hello.ko := ld -r -EL  -maarch64elf -z noexecstack --build-id=sha1  -T scripts/module.lds -o /home/debian/elec533/speed/hello.ko /home/debian/elec533/speed/hello.o /home/debian/elec533/speed/hello.mod.o;  true

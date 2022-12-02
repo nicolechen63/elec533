@@ -1,1 +1,0 @@
-cmd_/home/debian/elec533/speed/Module.symvers := sed 's/ko$$/o/' /home/debian/elec533/speed/modules.order | scripts/mod/modpost -m    -o /home/debian/elec533/speed/Module.symvers -e -i Module.symvers   -T -
