@@ -1,6 +1,6 @@
 # %%
 # ref: User raja_961, “Autonomous Lane-Keeping Car Using Raspberry Pi and OpenCV”. Instructables. URL: https://www.instructables.com/Autonomous-Lane-Keeping-Car-U sing-Raspberry-Pi-and/
-# ref: https://www.hackster.io/rlk3/young-boys-0b1d78
+
 # import necessay libraries
 import time
 import cv2
